@@ -5,22 +5,28 @@ import (
 	"encoding/csv"
 	"fmt"
 	"strconv"
+	"time"
+	"math"
 )
 
 func main() {
 	fileToRead := selectFile()
 	file, err := os.Open(fileToRead)
 	if err != nil {
-		print(err)
+		err := fmt.Errorf("file: %q not found ", fileToRead)
+		fmt.Print(err)
 		os.Exit(1)
 	}
 	reader := csv.NewReader(file)
 	data, err := reader.ReadAll()
+	totalProblems := len(data)
 	if err != nil {
 		os.Exit(1)
 	}
 
 	correctAnswers, incorrectAnswers := 0, 0
+
+	start := time.Now()
 
 	for i := range data {
 		var answer int
@@ -38,7 +44,9 @@ func main() {
 			incorrectAnswers++
 		}
 	}
-	checkFinalResults(correctAnswers, incorrectAnswers)
+	t := time.Now()
+	elapsed := t.Sub(start)
+	checkFinalResults(correctAnswers, incorrectAnswers, elapsed, totalProblems)
 }
 
 func checkAnswer(input int, answer int) bool {
@@ -51,14 +59,15 @@ func checkAnswer(input int, answer int) bool {
 	}
 }
 
-func checkFinalResults(correctAnswers int, incorrectAnswers int){
+func checkFinalResults(correctAnswers int, incorrectAnswers int, time time.Duration, totalProblems int){
 	if incorrectAnswers != 0 {
-		percentage := correctAnswers / incorrectAnswers
-		fmt.Print(percentage)
-		fmt.Printf("You got %d%% right!", percentage)
+		percentage := math.Round((float64(correctAnswers) / float64(totalProblems)) * 100)
+		fmt.Printf("You got %v%% right!\n", percentage)
+		fmt.Printf("It took you %v\n", time)
 		os.Exit(0)
 	} else {
 			fmt.Printf("YOU GOT THEM ALL RIGHT!")
+			fmt.Printf("It took you %v\n", time)
 	}
 }
 
