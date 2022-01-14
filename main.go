@@ -71,8 +71,6 @@ func checkFinalResults(correctAnswers int, incorrectAnswers int, time time.Durat
 	}
 }
 
-// TODO validate filepath
-
 func selectFile() string {
 	var filePath string		
 	fmt.Println("What file do you want to read?")
